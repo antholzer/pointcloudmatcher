@@ -37,6 +37,23 @@ pip install -e .
 
 ## Usage
 
+```python
+import numpy as np
+import sfb
+
+# load pretrained model
+model = sfb.load_network("weights/foldingnet.ckpt")
+
+# load pointcloud
+x = ...
+
+# define interpolation factor
+alpha = 0.2
+
+design_pc = sfb.density.normalize_design_pc(np.loadtxt("pointclouds/stripe.xyz"))
+
+z = sfb.apply_design(model, x, design_pc, model.config["num_points"], alpha)
+```
 
 ## Training
 
