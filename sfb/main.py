@@ -18,7 +18,7 @@ def load_network(weights: str, emd: bool = False):
         factors = json.load(open(f, "r"))
     extra_kwargs = {"batch_size": 8, "chamfer_factor": 1.0, "emd": emd, "emdscaling": 0.8, "loss_factors": factors}
 
-    net = FoldingNet(num_points=2048, shape="cube", feat_dim=512, **extra_kwargs)
+    net = FoldingNet(num_points=2048, shape="cube", feat_dim=512, k=16, **extra_kwargs)
     net.to(device)
     w = load_weights(weights, device)
     net.load_state_dict(w)
