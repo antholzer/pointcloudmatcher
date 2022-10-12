@@ -34,3 +34,25 @@ Then install the rest with
 ```
 pip install -e .
 ```
+
+## Usage
+
+
+## Training
+
+In order to train a model with your own dataset one first needs to apply the design point clouds (optional)
+and then cluster the pointclouds (unless they are already of the desired size).
+We provide a function to preprocess the data `preparedata` which works for xyz point clouds.
+If on has xyz point clouds in the folder `/data/` and a design point cloud `/example/design.xyz`, then
+use
+```python
+sfb.preparedata(["/data/"], ["/example/design.xyz"], "/output/", 2048)
+```
+This will create folders `/output/applied/design` with `design.xyz` applied to the point clouds
+and `/output/combined_split` with the individual clusters of all point clouds (in binary format).
+
+Then one can train a model
+```python
+python train.py --num_points=2048 --emd --blosc --datroot=/output/combined_split --factors_file=weights/factors.json
+```
+See `python train.py --help` for additional options.

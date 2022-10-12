@@ -3,10 +3,25 @@ import time
 import json
 import numpy as np
 import torch
-from .utils import load_weights, to_numpy, to_tensor
+from typing import List
+from .utils import load_weights, to_numpy, to_tensor, save_blz
 from .foldingnet import FoldingNet
-from .pointclouds import fragment_pointcloud_exact, reassemble_pointcloud, optimal_assignments_mcf
-from .density import apply_design_pc
+from .pointclouds import fragment_pointcloud_exact, reassemble_pointcloud, optimal_assignments_mcf, fragment_dataset
+from .density import apply_design_pc, normalize_design_pc, apply_designs_pcs_to_dataset
+from .data import xyzData, Normalize
+
+
+def preparedata(data_folders: List[str], design_pcs: List[str], outputdir: str, num_points: int = 2048):
+    data = xyzData(data_folders, split=1.0, transform=Normalize(box_center=True))
+    print("Applying {} designs to {} pointclouds".format(len(design_pcs), len(data)))
+    print("Saving to ", os.path.join(outputdir, "applied"))
+    design_pcs = {os.path.basename(f).split(".")[0]: normalize_design_pc(np.loadtxt(f)) for f in design_pcs}
+    apply_designs_pcs_to_dataset(data, design_pcs, os.path.join(outputdir, "applied"), n_jobs=8)
+    d = data_folders + [os.path.join(outputdir, "applied")]
+    out = os.path.join(outputdir, "combined_split")
+    data = xyzData(d, split=1.0, transform=Normalize(box_center=True))
+    print("Splitting {} pointclouds and saving to {}".format(len(data), out))
+    fragment_dataset(data, num_points, save_blz, out, "{}.blosc")
 
 
 def load_network(weights: str, emd: bool = False):
