@@ -44,16 +44,16 @@ def main(config):
         model.load_state_dict(weights)
         print("Initialized with weights {}".format(config["init"]))
 
-    train_loader = sfb.models.to_dataloader(train_data, config["batch_size"])
-    test_loader = sfb.models.to_dataloader(test_data, config["batch_size"])
-    callbacks = sfb.models.get_callbacks(
+    train_loader = sfb.utils.to_dataloader(train_data, config["batch_size"])
+    test_loader = sfb.utils.to_dataloader(test_data, config["batch_size"])
+    callbacks = sfb.utils.get_callbacks(
         logdir, config["num_epochs"], lr_scheduler=config.get("lr_scheduler", None), pc_save_data=test_loader
     )
 
     if config["dist"]:
         trainer = pl.Trainer(
             default_root_dir=logdir,
-            logger=sfb.models.get_logger(logdir, model),
+            logger=sfb.utils.get_logger(logdir, model),
             max_epochs=config["num_epochs"],
             callbacks=callbacks,
             accelerator="gpu",
@@ -63,7 +63,7 @@ def main(config):
     else:
         trainer = pl.Trainer(
             default_root_dir=logdir,
-            logger=sfb.models.get_logger(logdir, model),
+            logger=sfb.utils.get_logger(logdir, model),
             max_epochs=config["num_epochs"],
             gpus=1,
             callbacks=callbacks
@@ -74,43 +74,42 @@ def main(config):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--dataroot", type=str, help="path to dataset folder")
-    parser.add_argument("--num_epochs", type=int, default=100, help="number of epochs")
+    parser.add_argument("--num_epochs", type=int, default=100, help="number of epochs [100]")
     parser.add_argument(
-        "--gpu", type=int, default=-1, help="Number of GPUs to use. Set to -1 to use all available ones"
+        "--gpu", type=int, default=-1, help="Number of GPUs to use. Set to -1 to use all available ones [-1]"
     )
-    parser.add_argument("--batch_size", type=int, default=1, help="Batch size for training/validation")
-    parser.add_argument("--lr", type=float, default=0.0001, help="Starting learning rate")
+    parser.add_argument("--batch_size", type=int, default=1, help="Batch size for training/validation [1]")
+    parser.add_argument("--lr", type=float, default=0.0001, help="Starting learning rate [1e-4]")
     parser.add_argument("--lr_scheduler", action="store_true", help="use ReduceLROnPlateau lr_scheduler")
-    parser.add_argument("--lr_scheduler_step_size", type=int, default=10, help="Step size of lr scheduler")
-    parser.add_argument("--min_lr", type=float, default=1e-4, help="Min lr for lr_scheduler")
-    parser.add_argument("--lr_decay", type=float, default=0.5, help="LR scheduler decay factor")
+    parser.add_argument("--lr_scheduler_step_size", type=int, default=10, help="Step size of lr scheduler [10]")
+    parser.add_argument("--min_lr", type=float, default=1e-4, help="Min lr for lr_scheduler [1e-4]")
+    parser.add_argument("--lr_decay", type=float, default=0.5, help="LR scheduler decay factor [0.5]")
     parser.add_argument("--name", type=str, default="", help="Add extra name to logdir")
     parser.add_argument("--early_stopping", action="store_true", help="Use early stopping")
-    parser.add_argument("--es_n", type=int, default=10, help="Epoch patience for early stopping")
+    parser.add_argument("--es_n", type=int, default=10, help="Epoch patience for early stopping [10]")
     parser.add_argument(
         "--es_delta",
         type=float,
         default=0.001,
-        help="loss needs to improve by this much in order to be considered a change for no early stopping"
+        help="loss needs to improve by this much in order to be considered a change for no early stopping [0.001]"
     )
-    parser.add_argument("--es_stop", type=float, default=1.0, help="if loss is higher than this value stop training")
+    parser.add_argument("--es_stop", type=float, default=1.0, help="if loss is higher than this value stop training [1.0]")
     parser.add_argument("--feat_dim", type=int, default=512)
     parser.add_argument("--shape", type=str, default="cube")
-    parser.add_argument("--ply", action="store_true")
-    parser.add_argument("--xyz", action="store_true")
-    parser.add_argument("--blosc", action="store_true")
-    parser.add_argument("--num_points", type=int, default=2048, help="number of output points")
-    parser.add_argument("--k", "--K", type=int, default=16, help="K in K-NN graph in encoder")
+    parser.add_argument("--xyz", action="store_true", help="assume data is stored as xyz")
+    parser.add_argument("--blosc", action="store_true", help="assume data is stored as blosc compressed binary")
+    parser.add_argument("--num_points", type=int, default=2048, help="number of output points [2048]")
+    parser.add_argument("--k", "--K", type=int, default=16, help="K in K-NN graph in encoder [16]")
     parser.add_argument("--init", type=str, default=None, help="path to initial weights")
     parser.add_argument("--emd", action="store_true", help="use EMD as loss function")
-    parser.add_argument("--p", type=float, default=2, help="use p-norm for EMD")
-    parser.add_argument("--emdscaling", type=float, default=0.9, help="closer to 1 for more accurate but slower EMD")
+    parser.add_argument("--p", type=float, default=2, help="use p-norm for EMD [2]")
+    parser.add_argument("--emdscaling", type=float, default=0.9, help="closer to 1 for more accurate but slower EMD [0.9]")
     parser.add_argument("--factors_file", type=str, default="", help="json file with loss weight factors")
     parser.add_argument(
         "--chamfer_factor",
         type=float,
         default=1.0,
-        help="Also use chamfer distance with this factor together with EMD"
+        help="Also use chamfer distance with this factor together with EMD [1.0]"
     )
 
     args = vars(parser.parse_args())

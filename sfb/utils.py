@@ -56,9 +56,6 @@ def get_logdir(name, config):
     if config.get("name", None) is not None:
         s = s + config["name"]
     d = os.path.join(get_root_dir(), "logs", s)
-    if os.path.isdir(d):
-        raise ValueError("Folder {} already exists".format(d))
-    os.makedirs(d)
     return d
 
 
