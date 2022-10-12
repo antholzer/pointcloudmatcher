@@ -1,0 +1,7 @@
+{
+  "EMD": 0.1797846406698227,
+  "chamfer": 0.031437214463949203,
+  "comment": "dataroot: /data/designpc_data/combined_split\nseed: 2117940334",
+  "dataset": "<torch.utils.data.dataset.Subset object at 0x7fb4321008b0>",
+  "split": 0.02
+}
