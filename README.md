@@ -1,3 +1,7 @@
+# pointcloudmatcher
+
+Code for the paper: "Cluster-Based Autoencoders for Volumetric Point Clouds".
+
 ## Installation
 
 Create a python virtual environment and [pytorch](https://pytorch.org/get-started/locally/) (preferably version 1.11) and [pytorch3d](https://github.com/facebookresearch/pytorch3d/blob/master/INSTALL.md)  (tested with version 0.6.2).
