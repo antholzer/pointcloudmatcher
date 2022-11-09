@@ -1,6 +1,6 @@
 # pointcloudmatcher
 
-Code for the paper: "Cluster-Based Autoencoders for Volumetric Point Clouds".
+Code for the paper: "Cluster-Based Autoencoders for Volumetric Point Clouds" [arXiv:2211.01009](https://arxiv.org/abs/2211.01009).
 
 ## Installation
 
